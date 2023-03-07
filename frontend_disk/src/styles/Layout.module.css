@@ -1,0 +1,31 @@
+@font-face {
+    font-family: "Montse";
+    src: url("../assets/fonts/Montserrat-Regular.woff2") format("woff2");
+  }
+  @font-face {
+    font-family: "Tumbly";
+    src: url("../assets/fonts//TumblyA2.otf");
+  }
+  
+  .container {
+    display: flex;
+    justify-content: center;
+    margin: 0;
+    
+    width: 100%;
+    transition: background-color 0.5s ease;
+  }
+  
+
+  *::-webkit-scrollbar {
+    width: 12px;
+  }
+  
+  *::-webkit-scrollbar-track {
+    background: #8c8d94;
+  }
+  
+  *::-webkit-scrollbar-thumb {
+    background-color: #424247;
+  }
+  

@@ -1,12 +1,14 @@
 import express from "express";
 import path from "path";
 import morgan from "morgan";
+import cors from "cors";
 
 const app = express();
 
 app.set("port", process.env.PORT || 5000);
 app.use(morgan("dev"));
 app.use(express.json());
+app.use(cors());
 
 // routes
 import files from "./routes/files.routes.js";
@@ -14,7 +16,6 @@ app.use("/api", files);
 
 import storage from "./routes/storage.routes.js";
 app.use("/api", storage);
-
 
 app.use((req, res, next) => {
   res

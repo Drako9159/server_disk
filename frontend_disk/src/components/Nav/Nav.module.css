@@ -1,0 +1,10 @@
+.container{
+    
+    font-family: "montse";
+    background-color: #cccccc;
+    padding: 10px;
+    width: 100%;
+}
+.navText{
+    cursor: pointer;
+}

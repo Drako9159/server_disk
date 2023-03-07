@@ -1,2 +1,4 @@
 /backend_disk/node_modules/
+/frontend_disk/node_modules/
+/node_modules
 /backend_disk/src/storage/*
