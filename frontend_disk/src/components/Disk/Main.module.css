@@ -1,13 +1,20 @@
 .container {
   display: flex;
   flex-wrap: wrap;
-  
-  
   font-family: "montse";
+  padding: 10px;
   color: #000000;
+  background-color: #a0a0a0;
+  margin: 0 auto;
+  width: 90%;
+  gap: 10px;
   
-  width: 100%;
-  gap: 25px;
+}
+
+
+
+.noFiles {
+  font-family: "montse";
 }
 .card {
   display: flex;
@@ -15,20 +22,26 @@
   flex-direction: column;
   align-items: center;
   
-  
 }
 .card:hover {
   cursor: pointer;
-
   box-shadow: 0 0 2px 0 #000000;
   transition: box-shadow 0.3s ease;
 }
 .iconFolder {
-   
   width: 90px;
 }
-.folderName{
-    padding: 1px;
-    
-    margin: 0;
+.folderName {
+  text-align: center;
+  padding: 1px;
+  margin: 0;
+}
+.contentName {
+  width: 100%;
+  overflow: auto;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  
+ 
 }

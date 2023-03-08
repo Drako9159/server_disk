@@ -1,0 +1,64 @@
+.container {
+  background-color: red;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  width: 90%;
+  margin: 0 auto;
+  
+  padding: 10px;
+  animation: modal .5s ease;
+}
+@keyframes modal {
+    0%{ max-height: 0px; }
+    100%{ max-height: 100px; }
+}
+
+.modal {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+}
+
+.modal input[type="text"] {
+    
+  padding: 7.5px;
+  font-family: "montse";
+  outline: none;
+  border: none;
+}
+.modal input[type="file"]{
+    font-family: "montse";
+    display: none;
+    border:none;
+}
+.modal label{
+    font-family: "montse";
+    background-color: #cccccc;
+    padding: 7px;
+    cursor: pointer;
+}
+.modal button {
+    font-family: "montse";
+  padding: 8px;
+  border: none;
+  cursor: pointer;
+}
+.close{
+    cursor: pointer;
+    margin: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: "montse";
+    padding: 10px;
+    background-color: green;
+    width: 5px;
+    height: 5px;
+}
+.file{
+    font-family: "montse";
+}

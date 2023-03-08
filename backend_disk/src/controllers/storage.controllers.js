@@ -6,6 +6,14 @@ const DB_PATH = path.join(process.cwd(), "./src/database/");
 
 const json_files = fs.readFileSync(`${DB_PATH}/files.json`, "utf-8");
 
+function formatBytes(bytes, decimals = 2) {
+  if (!+bytes) return "0 Bytes";
+  const k = 1024;
+  const dm = decimals < 0 ? 0 : decimals;
+  const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
+}
 
 // reader files and folders
 export async function getFolders(req, res) {
@@ -20,7 +28,19 @@ export async function getFolders(req, res) {
   }
   try {
     const readFolders = fs.readdirSync(STORAGE_PATH);
-    res.send({  folder: readFolders });
+    let data = [];
+    readFolders.forEach((e) => {
+      let info = fs.statSync(STORAGE_PATH + e);
+      let isDirectory = info.isDirectory();
+      let size = formatBytes(info.size);
+      let type = path.extname(STORAGE_PATH+e)
+      type = type === "" ? "folder" : type
+
+      data.push({ name: e, isDirectory: isDirectory, size: size, type: type });
+    });
+    
+
+    res.send({ data: data });
   } catch (error) {
     handleError(res, "NO_FOLDER_SUCH", 404);
   }
@@ -30,8 +50,8 @@ export async function getFolders(req, res) {
 export async function newFolder(req, res) {
   // receive folderPath and create
   const { folderPath } = req.body;
-  if(!folderPath){
-    handleError(res, "FAIL_FOLDER_PATH", 500)
+  if (!folderPath) {
+    handleError(res, "FAIL_FOLDER_PATH", 500);
   } else {
     let STORAGE_PATH = path.join(process.cwd(), "./src/storage/");
     try {
