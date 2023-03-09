@@ -1,9 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { getFolders, getFiles } from "../../api/files";
 import styles from "./Main.module.css";
-import iconFolder from "../../assets/icons/disk/folder-fill.svg";
-import iconFile from "../../assets/icons/disk/file.svg";
-
+const URL = import.meta.env.VITE_BACKEND;
 export default function Main({
   modal,
   setModal,
@@ -36,7 +34,7 @@ export default function Main({
   }
 
   function handleClick(folder) {
-    if (folder.type !== "folder") {
+    if (!folder.isDirectory) {
       setModal({
         modal: true,
         value: "file",
@@ -45,6 +43,7 @@ export default function Main({
         name: folder.name,
       });
     } else {
+      setModal({ modal: false, value: "none" });
       let navs = parseNav(folder.name);
       getFiles(navs).then((data) => {
         setFolders(data.data.data);
@@ -55,7 +54,7 @@ export default function Main({
   if (folders.length < 1)
     return (
       <div className={styles.container}>
-        <h1 className={styles.noFiles}>no files</h1>
+        <h1 className={styles.noFiles}>empty</h1>
       </div>
     );
 
@@ -70,7 +69,9 @@ export default function Main({
           >
             <img
               className={styles.iconFolder}
-              src={e.isDirectory ? iconFolder : iconFile}
+              src={`${URL}/storage/icons?type=${
+                e.isDirectory ? "folder_fill" : "file"
+              }`}
               alt="folder"
             />
             <div className={styles.contentName}>

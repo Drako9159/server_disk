@@ -1,4 +1,5 @@
 import styles from "./Actions.module.css";
+import iconMenu from "../../assets/icons/menu.svg";
 import { useState } from "react";
 
 export default function Actions({ modal, setModal }) {
@@ -12,9 +13,8 @@ export default function Actions({ modal, setModal }) {
   }
   return (
     <>
-    
       <div onClick={activeBtn} className={styles.container}>
-     
+      <img className={styles.iconMenu} src={iconMenu}></img>
         {btnActive ? (
           <div>
             <button onClick={handleClick} value="create">Create folder</button>

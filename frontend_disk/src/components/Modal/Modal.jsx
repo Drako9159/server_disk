@@ -1,6 +1,12 @@
 import styles from "./Modal.module.css";
 import { useState } from "react";
-import { createFolder, getFiles, uploadFile } from "../../api/files";
+import {
+  createFolder,
+  getFiles,
+  uploadFile,
+  downloadFile,
+} from "../../api/files";
+const URL = import.meta.env.VITE_BACKEND;
 export default function Modal({
   setCharge,
   modal,
@@ -8,6 +14,7 @@ export default function Modal({
   nav,
   folders,
   setFolders,
+ 
 }) {
   const [folderName, setFolderName] = useState();
   const [file, setFile] = useState();
@@ -16,6 +23,7 @@ export default function Modal({
       handleClick();
     }
   }
+  
   function handleClick() {
     //setModal(false);
     let navs = "";
@@ -30,6 +38,8 @@ export default function Modal({
     });
     setModal({ modal: false, value: "none" });
   }
+  
+
   function handleChange(e) {
     const folderName = e.target.value;
     setFolderName(folderName);
@@ -55,6 +65,10 @@ export default function Modal({
   function handleClose() {
     setModal({ modal: false, value: "none" });
   }
+  let navs = "";
+  nav.forEach((e) => {
+    navs += `${e}/`;
+  });
 
   return (
     <>
@@ -90,18 +104,30 @@ export default function Modal({
             </div>
           </div>
         </div>
-      ) :  modal.value === "file" ? (
+      ) : modal.value === "file" ? (
         <div className={styles.container}>
-            <div className={styles.modal}>
-                <div className={styles.file}>
-                    <div className={styles.file__name}>{modal.name}</div>
-                    <div className={styles.file__size}>{modal.size}</div>
-                    <div className={styles.file__type}>{modal.type}</div>
-                </div>
-                <div onClick={handleClose} className={styles.close}>
-                    X
-                </div>
+          <div className={styles.modal}>
+            <div className={styles.file}>
+              <div className={styles.info}>
+                <div className={styles.file__name}>{modal.name}</div>
+                <div className={styles.file__size}>size: {modal.size}</div>
+                <div className={styles.file__type}>type: {modal.type}</div>
+              </div>
+              <div>
+                <a className={styles.button}
+                  target="_blank"
+                  href={`${URL}/storage/download?file=${
+                    navs + modal.name
+                  }`}
+                >
+                  download
+                </a>
+              </div>
             </div>
+            <div onClick={handleClose} className={styles.close}>
+              X
+            </div>
+          </div>
         </div>
       ) : null}
     </>

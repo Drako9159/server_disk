@@ -14,7 +14,7 @@ export default function Disk() {
   return (
     <div style={{ width: "100%" }}>
       <Nav nav={nav} setNav={setNav} setFolders={setFolders} />
-      
+
       <Modal
         setCharge={setCharge}
         modal={modal}
@@ -23,16 +23,15 @@ export default function Disk() {
         folders={folders}
         setFolders={setFolders}
       />
-      { charge ? <ChargeAnimation /> : null}
+      {charge ? <ChargeAnimation /> : null}
       <Main
-      modal={modal}
-      setModal={setModal}
+        modal={modal}
+        setModal={setModal}
         nav={nav}
         setNav={setNav}
         folders={folders}
         setFolders={setFolders}
       />
-      
 
       <Actions modal={modal} setModal={setModal} />
     </div>

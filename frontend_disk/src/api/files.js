@@ -23,7 +23,37 @@ export async function uploadFile(path, file) {
     },
   });
 }
+export async function getIcons() {
+  return axios
+    .get("/storage/icons?type=file", { headers: { Accept: "video/mp4;charset=UTF-8" } })
+    .then((response) => {
+      myUrl = (window.URL || window.webkitURL).createObjectURL(
+        new Blob([response.data])
+      ); // response.data.data
 
-export async function getInfo(path) {
-  return await axios.get(`/storage/info?file=${path}`);
+      var myVid = document.getElementById("vidObj");
+      myVid.setAttribute("src", myUrl);
+      myVid.play(); //# test playback
+
+      //setVideo(url); //# is this needed?
+    });
+}
+export async function downloadFile(path, name) {
+  return await axios
+    .request({
+      url: `/storage/download?file=${path}`,
+      method: "GET",
+      responseType: "blob",
+    })
+    .then(({ data }) => {
+      const downloadUrl = window.URL.createObjectURL(new Blob([data]));
+      const link = document.createElement("a");
+      link.href = downloadUrl;
+      link.setAttribute("download", name);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    });
+
+  //eturn await axios.get(`/storage/download?file=${path}`, );
 }

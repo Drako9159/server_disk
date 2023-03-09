@@ -1,6 +1,6 @@
 export const night = {
     layout: {
-      backgroundColor: "#1f2028",
+      backgroundColor: "#393e46",
     },
     textEnable: {
       color: "#ececec",

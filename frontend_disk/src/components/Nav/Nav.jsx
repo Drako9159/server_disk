@@ -1,7 +1,7 @@
 import styles from "./Nav.module.css";
 import { getFolders } from "../../api/files";
 import { getFiles } from "../../api/files";
-import iconStorage from "../../assets/icons/disk/storage.svg";
+const URL = import.meta.env.VITE_BACKEND;
 export default function Nav({ nav, setNav, setFolders }) {
   function parseNav() {
     nav.pop();
@@ -17,6 +17,7 @@ export default function Nav({ nav, setNav, setFolders }) {
   function handleClickStorage() {
     getFolders().then((data) => setFolders(data.data.data));
     setNav([]);
+   
   }
 
   function handleClick(e) {
@@ -33,15 +34,17 @@ export default function Nav({ nav, setNav, setFolders }) {
 
   return (
     <div className={styles.container}>
-      <img onClick={handleClickStorage} src={iconStorage}></img>
+      <img
+        onClick={handleClickStorage}
+        src={`${URL}/storage/icons?type=storage`}
+      ></img>
       {nav.map((e) => {
         return (
           <div key={e} className={styles.nav}>
-            <p> &nbsp; </p>
             <p onClick={() => handleClick()} className={styles.navText}>
-              {e}
+              {e}&nbsp;/
+
             </p>
-            <p> &nbsp; /</p>
           </div>
         );
       })}

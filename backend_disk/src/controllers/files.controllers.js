@@ -9,6 +9,7 @@ const ICON_FOLDER_FILL = path.join(
   "./src/assets/folder-fill.svg"
 );
 const ICON_FILE = path.join(process.cwd(), "./src/assets/file.svg");
+const ICON_STORAGE = path.join(process.cwd(), "./src/assets/storage.svg");
 const STORAGE_PATH = path.join(process.cwd(), "./src/storage/");
 const json_files = fs.readFileSync(`${DB_PATH}/files.json`, "utf-8");
 
@@ -29,7 +30,13 @@ export async function getIcons(req, res) {
           handleError(res, "NOT_SERVE_FILE", 500);
         }
       });
-    } else {
+    } else if (type == "storage") {
+      res.download(ICON_STORAGE, (err) => {
+        if (err) {
+          handleError(res, "NOT_SERVE_FILE", 500);
+        }
+      });
+    } else  {
       handleError(res, "ICON_NOT_IDENTIFY", 500);
     }
   }

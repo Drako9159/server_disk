@@ -1,39 +1,46 @@
 .container {
   font-family: "montse";
-  background-color: blue;
+  background-color: #f96d00;
+  box-shadow: 0 0 3px 0 #f96d00;
   width: 70px;
   height: 70px;
   border-radius: 100%;
   position: fixed;
   cursor: pointer;
-  bottom: 10px;
-  position: sticky;
+  bottom: 20px;
+  left: 20px;
+  position: fixed;
 }
-
+.iconMenu {
+  position: relative;
+  left: 15px;
+  top: 15px;
+  width: 40px;
+}
 
 .container div {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    flex-direction: column;
-    background-color: red;
-    width: 150px;
-    height: 100px;
-    left: 30px;
-    border-radius: 10px 10px 10px 0;
-    position: relative;
-    top: -90px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-direction: column;
+  background-color: #222831;
 
+  width: 150px;
+  height: 100px;
+  left: 55px;
+  border-radius: 10px 10px 10px 0;
+  position: relative;
+  top: -125px;
 }
-.container div button{
-    font-family: "montse";
-    background-color: red;
-    cursor: pointer;
-    padding: 10px;
-    border: none;
+.container div button {
+  font-family: "montse";
 
+  cursor: pointer;
+  padding: 10px;
+  border: none;
+  background-color: #222831;
+  color: #ffffff;
 }
-.container div button:hover{
- background-color: white;
+.container div button:hover {
+  background-color: #292f38;
 }
-
