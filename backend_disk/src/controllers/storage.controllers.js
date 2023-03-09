@@ -4,6 +4,7 @@ import handleError from "../utils/handleError.js";
 
 const DB_PATH = path.join(process.cwd(), "./src/database/");
 
+
 const json_files = fs.readFileSync(`${DB_PATH}/files.json`, "utf-8");
 
 function formatBytes(bytes, decimals = 2) {
@@ -28,19 +29,18 @@ export async function getFolders(req, res) {
   }
   try {
     const readFolders = fs.readdirSync(STORAGE_PATH);
+    let dir = STORAGE_PATH.replace(/\\/gi, "/").split("storage/")[1];
     let data = [];
     readFolders.forEach((e) => {
       let info = fs.statSync(STORAGE_PATH + e);
       let isDirectory = info.isDirectory();
       let size = formatBytes(info.size);
-      let type = path.extname(STORAGE_PATH+e)
-      type = type === "" ? "folder" : type
-
+      let type = path.extname(STORAGE_PATH + e);
+      type = type === "" ? "folder" : type;
       data.push({ name: e, isDirectory: isDirectory, size: size, type: type });
     });
-    
 
-    res.send({ data: data });
+    res.send({ data: data, directory: dir });
   } catch (error) {
     handleError(res, "NO_FOLDER_SUCH", 404);
   }

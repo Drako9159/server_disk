@@ -10,6 +10,8 @@ app.use(morgan("dev"));
 app.use(express.json());
 app.use(cors());
 
+app.use(express.static(path.join(process.cwd(), "./public")))
+
 // routes
 import files from "./routes/files.routes.js";
 app.use("/api", files);
