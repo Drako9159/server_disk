@@ -4,7 +4,6 @@ import handleError from "../utils/handleError.js";
 
 const DB_PATH = path.join(process.cwd(), "./src/database/");
 
-
 const json_files = fs.readFileSync(`${DB_PATH}/files.json`, "utf-8");
 
 function formatBytes(bytes, decimals = 2) {
@@ -28,21 +27,68 @@ export async function getFolders(req, res) {
     STORAGE_PATH = path.join(process.cwd(), `./src/storage/${folder}/`);
   }
   try {
+    let ICONS_PATH = path.join(process.cwd(), `./src/assets/iconsFormat/`);
+    const readIcons = fs.readdirSync(ICONS_PATH);
+    //console.log(readIcons)
     const readFolders = fs.readdirSync(STORAGE_PATH);
     let dir = STORAGE_PATH.replace(/\\/gi, "/").split("storage/")[1];
     let data = [];
+
     readFolders.forEach((e) => {
       let info = fs.statSync(STORAGE_PATH + e);
       let isDirectory = info.isDirectory();
       let size = formatBytes(info.size);
       let type = path.extname(STORAGE_PATH + e);
+
       type = type === "" ? "folder" : type;
-      data.push({ name: e, isDirectory: isDirectory, size: size, type: type });
+
+      let typeFormat = path.extname(STORAGE_PATH + e).toLowerCase();
+      if (!isDirectory) {
+        typeFormat = typeFormat.split(".")[1] + ".png";
+      } else {
+        typeFormat = "folder-fill.svg";
+      }
+      if(!readIcons.includes(typeFormat)) {
+        typeFormat = "file.svg"
+      }
+      
+
+      data.push({
+        name: e,
+        isDirectory: isDirectory,
+        size: size,
+        type: type,
+        icon_path: typeFormat,
+      });
     });
 
     res.send({ data: data, directory: dir });
   } catch (error) {
     handleError(res, "NO_FOLDER_SUCH", 404);
+  }
+}
+
+export async function getIcons(req, res) {
+  const { format } = req.query;
+  let STORAGE_PATH = path.join(process.cwd(), `./src/assets/iconsFormat/`);
+  const readIcons = fs.readdirSync(STORAGE_PATH);
+  if (!format) {
+    res.send({ data: readIcons });
+  } else {
+    try {
+      let exist = readIcons.includes(format);
+      if (exist) {
+        res.download(STORAGE_PATH + format, (err) => {
+          if (err) {
+            handleError(res, "NOT_SERVE_FILE", 500);
+          }
+        });
+      } else {
+        handleError(res, "FORMAT_NOT_INCLUDE", 404);
+      }
+    } catch (error) {
+      handleError(res, "NO_ICON_SUCH", 404);
+    }
   }
 }
 

@@ -69,8 +69,8 @@ export default function Main({
           >
             <img
               className={styles.iconFolder}
-              src={`${URL}/storage/icons?type=${
-                e.isDirectory ? "folder_fill" : "file"
+              src={`${URL}/storage/icons?format=${
+                e.icon_path 
               }`}
               alt="folder"
             />

@@ -14,7 +14,7 @@ router.get("/storage/info", getInfo)
 
 router.post("/storage/upload", uploadMiddleware.single("myFile"), uploadFile);
 
-router.get("/storage/icons", getIcons)
+//router.get("/storage/icons", getIcons)
 
 
 export default router;

@@ -33,10 +33,10 @@ export default function Nav({ nav, setNav, setFolders }) {
   }
 
   return (
-    <div className={styles.container}>
+    <div className={styles.container} id="nav">
       <img
         onClick={handleClickStorage}
-        src={`${URL}/storage/icons?type=storage`}
+        src={`${URL}/storage/icons?format=storage.svg`}
       ></img>
       {nav.map((e) => {
         return (
