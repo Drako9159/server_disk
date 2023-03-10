@@ -1,24 +1,20 @@
 import fs from "fs";
 import path from "node:path";
 import handleError from "../utils/handleError.js";
+import handleFormatBytes from "../utils/handleFormatBytes.js";
+import {
+  readExist,
+  readStat,
+  createFolder,
+  readIcons,
+  sendIcon
+} from "../libs/reader.js";
 
 const DB_PATH = path.join(process.cwd(), "./src/database/");
-
 const json_files = fs.readFileSync(`${DB_PATH}/files.json`, "utf-8");
-
-function formatBytes(bytes, decimals = 2) {
-  if (!+bytes) return "0 Bytes";
-  const k = 1024;
-  const dm = decimals < 0 ? 0 : decimals;
-  const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
-}
 
 // reader files and folders
 export async function getFolders(req, res) {
-  // query need path folder
-  // image/png/exampe.png
   const { folder } = req.query;
   let STORAGE_PATH = "";
   if (!folder) {
@@ -29,6 +25,8 @@ export async function getFolders(req, res) {
   try {
     let ICONS_PATH = path.join(process.cwd(), `./src/assets/iconsFormat/`);
     const readIcons = fs.readdirSync(ICONS_PATH);
+
+    
     //console.log(readIcons)
     const readFolders = fs.readdirSync(STORAGE_PATH);
     let dir = STORAGE_PATH.replace(/\\/gi, "/").split("storage/")[1];
@@ -37,7 +35,7 @@ export async function getFolders(req, res) {
     readFolders.forEach((e) => {
       let info = fs.statSync(STORAGE_PATH + e);
       let isDirectory = info.isDirectory();
-      let size = formatBytes(info.size);
+      let size = handleFormatBytes(info.size);
       let type = path.extname(STORAGE_PATH + e);
 
       type = type === "" ? "folder" : type;
@@ -48,10 +46,9 @@ export async function getFolders(req, res) {
       } else {
         typeFormat = "folder-fill.svg";
       }
-      if(!readIcons.includes(typeFormat)) {
-        typeFormat = "file.svg"
+      if (!readIcons.includes(typeFormat)) {
+        typeFormat = "file.svg";
       }
-      
 
       data.push({
         name: e,
@@ -68,21 +65,63 @@ export async function getFolders(req, res) {
   }
 }
 
+
+// test
+export async function gestFolders(req, res) {
+  const { folder } = req.query;
+  let folders = [];
+  if (!folder) {
+    folders = await readFolders();
+  } else {
+    folders = await readFolders(folder);
+  }
+  try {
+    const icons = await readIcons();
+
+    let data = [];
+    folders.forEach(async (e) => {
+      let info = await readStat(e);
+      let isDirectory = info.isDirectory();
+      let size = handleFormatBytes(info.size);
+      let typeFormat = getExtname(e).toLowerCase();
+      let type = "";
+      if (isDirectory) {
+        type = "folder";
+        typeFormat = "folder-fill.svg";
+      } else {
+        type = getExtname(e);
+        typeFormat = typeFormat.split(".")[1] + ".png";
+      }
+
+      if (!icons.includes(typeFormat)) {
+        typeFormat = "file.svg";
+      }
+
+      data.push({
+        name: e,
+        isDirectory: isDirectory,
+        size: size,
+        type: type,
+        icon_path: typeFormat,
+      });
+    });
+
+    res.send({ data: await data });
+  } catch (error) {
+    handleError(res, "NO_FOLDER_SUCH", 404);
+  }
+}
+
+
 export async function getIcons(req, res) {
   const { format } = req.query;
-  let STORAGE_PATH = path.join(process.cwd(), `./src/assets/iconsFormat/`);
-  const readIcons = fs.readdirSync(STORAGE_PATH);
+  const icons = await readIcons();
   if (!format) {
-    res.send({ data: readIcons });
+    res.send({ data: icons });
   } else {
     try {
-      let exist = readIcons.includes(format);
-      if (exist) {
-        res.download(STORAGE_PATH + format, (err) => {
-          if (err) {
-            handleError(res, "NOT_SERVE_FILE", 500);
-          }
-        });
+      if (icons.includes(format)) {
+        await sendIcon(res, format)
       } else {
         handleError(res, "FORMAT_NOT_INCLUDE", 404);
       }
@@ -92,9 +131,24 @@ export async function getIcons(req, res) {
   }
 }
 
-// create new folder
 export async function newFolder(req, res) {
-  // receive folderPath and create
+  const { folderPath } = req.query;
+  if (!folderPath) handleError(res, "NOT_¨PROVIDER_PATH", 500);
+  try {
+    if (await readExist(folderPath)) {
+      handleError(res, "FOLDER_EXIST", 500);
+    } else {
+      await createFolder(folderPath);
+      res.send({ message: "FOLDER_CREATED" });
+    }
+  } catch (err) {
+    handleError(res, "INVALID_PATH_FOLDER", 500);
+  }
+}
+
+// create new folder / depreacated
+/*
+export async function newsFolder(req, res) {
   const { folderPath } = req.body;
   if (!folderPath) {
     handleError(res, "FAIL_FOLDER_PATH", 500);
@@ -104,7 +158,7 @@ export async function newFolder(req, res) {
       if (!fs.existsSync(STORAGE_PATH + `${folderPath}`)) {
         fs.mkdirSync(STORAGE_PATH + `${folderPath}`);
         res.send({ message: "FOLDER_CREADO" });
-      } else if (fs.existsSync(STORAGE_PATH + `${newFolder}`)) {
+      } else if (fs.existsSync(STORAGE_PATH + `${folderPath}`)) {
         res.send({ message: "FOLDER_EXIST" });
       }
     } catch (e) {
@@ -112,3 +166,4 @@ export async function newFolder(req, res) {
     }
   }
 }
+*/

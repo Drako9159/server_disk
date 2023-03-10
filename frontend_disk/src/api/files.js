@@ -8,7 +8,7 @@ export async function getFiles(folderPath) {
 }
 export async function createFolder(navs, folderPath) {
   let check = `${navs}${folderPath}`;
-  const res = await axios.post("/storage", { folderPath: check });
+  const res = await axios.post("/storage?folderPath="+check);
   res.headers["Content-Type"];
   return res;
 }
