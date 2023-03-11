@@ -4,7 +4,7 @@ import handleError from "../utils/handleError.js";
 import handleFormatBytes from "../utils/handleFormatBytes.js";
 import {
   readExist,
-  readStat,
+  getFoldersData,
   createFolder,
   readIcons,
   sendIcon
@@ -14,7 +14,7 @@ const DB_PATH = path.join(process.cwd(), "./src/database/");
 const json_files = fs.readFileSync(`${DB_PATH}/files.json`, "utf-8");
 
 // reader files and folders
-export async function getFolders(req, res) {
+export async function getsFolders(req, res) {
   const { folder } = req.query;
   let STORAGE_PATH = "";
   if (!folder) {
@@ -25,13 +25,9 @@ export async function getFolders(req, res) {
   try {
     let ICONS_PATH = path.join(process.cwd(), `./src/assets/iconsFormat/`);
     const readIcons = fs.readdirSync(ICONS_PATH);
-
-    
-    //console.log(readIcons)
     const readFolders = fs.readdirSync(STORAGE_PATH);
     let dir = STORAGE_PATH.replace(/\\/gi, "/").split("storage/")[1];
     let data = [];
-
     readFolders.forEach((e) => {
       let info = fs.statSync(STORAGE_PATH + e);
       let isDirectory = info.isDirectory();
@@ -67,46 +63,16 @@ export async function getFolders(req, res) {
 
 
 // test
-export async function gestFolders(req, res) {
+export async function getFolders(req, res) {
   const { folder } = req.query;
-  let folders = [];
+  let folders = []
   if (!folder) {
-    folders = await readFolders();
+    folders = await getFoldersData();
   } else {
-    folders = await readFolders(folder);
+    folders = await getFoldersData(folder);
   }
   try {
-    const icons = await readIcons();
-
-    let data = [];
-    folders.forEach(async (e) => {
-      let info = await readStat(e);
-      let isDirectory = info.isDirectory();
-      let size = handleFormatBytes(info.size);
-      let typeFormat = getExtname(e).toLowerCase();
-      let type = "";
-      if (isDirectory) {
-        type = "folder";
-        typeFormat = "folder-fill.svg";
-      } else {
-        type = getExtname(e);
-        typeFormat = typeFormat.split(".")[1] + ".png";
-      }
-
-      if (!icons.includes(typeFormat)) {
-        typeFormat = "file.svg";
-      }
-
-      data.push({
-        name: e,
-        isDirectory: isDirectory,
-        size: size,
-        type: type,
-        icon_path: typeFormat,
-      });
-    });
-
-    res.send({ data: await data });
+    res.send({ data: folders });
   } catch (error) {
     handleError(res, "NO_FOLDER_SUCH", 404);
   }

@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import mime from "mime-types";
+import handleFormatBytes from "../utils/handleFormatBytes.js";
 
 function pathJoin(seed, file = "") {
   const library = {
@@ -33,12 +34,17 @@ export async function sendIcon(res, file) {
     }
   });
 }
+
 export function getExtname(file) {
   return path.extname(pathJoin("pathFolders", file));
 }
 
 export async function readFolders(file = "") {
-  return fs.readdirSync(pathJoin("pathFolders", file));
+  try {
+    return fs.readdirSync(pathJoin("pathFolders", file));
+  } catch (err) {
+    return "ERROR_FOLDER_NOT_FOUND";
+  }
 }
 
 export async function readStat(file) {
@@ -47,6 +53,42 @@ export async function readStat(file) {
 
 export async function readExist(folder) {
   return fs.existsSync(pathJoin("pathFolders", folder));
+}
+
+export async function getFoldersData(folder = "") {
+  let data = [];
+
+  const folders = await readFolders(folder);
+  if (folders == "ERROR_FOLDER_NOT_FOUND") return folders;
+  const icons = await readIcons();
+  const gen = pathJoin("pathFolders", folder);
+
+  folders.forEach(async (e) => {
+    let info = fs.statSync(gen + "/" + e);
+    let isDirectory = info.isDirectory();
+    let size = handleFormatBytes(info.size);
+    let typeFormat = getExtname(e).toLowerCase();
+    let type = "";
+
+    if (isDirectory) {
+      type = "folder";
+      typeFormat = "folder-fill.svg";
+    } else {
+      type = getExtname(e);
+      typeFormat = typeFormat.split(".")[1] + ".png";
+    }
+    if (!icons.includes(typeFormat)) {
+      typeFormat = "file.svg";
+    }
+    data.push({
+      name: e,
+      isDirectory: isDirectory,
+      size: size,
+      type: type,
+      icon_path: typeFormat,
+    });
+  });
+  return await data;
 }
 
 export async function createFolder(folder) {

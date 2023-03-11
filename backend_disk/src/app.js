@@ -20,6 +20,9 @@ app.use("/api", files);
 import storage from "./routes/storage.routes.js";
 app.use("/api", storage);
 
+import storageV2 from "./routes/storage.v2.routes.js";
+app.use("/api/v2", storageV2);
+
 app.use((req, res, next) => {
   res
     .status(404)
