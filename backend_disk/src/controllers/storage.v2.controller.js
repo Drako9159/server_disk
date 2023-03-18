@@ -1,83 +1,65 @@
-import fs from "node:fs";
-import path from "node:path";
-
 import handleError from "../utils/handleError.js";
-import handleFormatBytes from "../utils/handleFormatBytes.js";
+import {
+  recoverData,
+  checkExist,
+  sendIcons,
+  sendDownload,
+  mkdirFolder,
+} from "../libs/reader-v2.js";
 
-export function getPath(seed, file = "") {
-  const library = {
-    pathIcons: path.join(process.cwd(), `./src/assets/iconsFormat/${file}`),
-    pathFolders: path.join(process.cwd(), `./src/storage/${file}`),
-  };
-  return library[seed].replace(/\\/gi, "/");
-}
-export async function reader(res, seed, folder = "", item = "") {
+export async function getDirectories(req, res) {
+  const { folder } = req.query;
   try {
-    const library = {
-      readIcons: fs.readdirSync(getPath("pathIcons")),
-      readFolders: fs.readdirSync(getPath("pathFolders", folder)),
-      readStat: fs.statSync(getPath("pathFolders", folder) + "/" + item),
-      readExtname: path.extname(getPath("pathFolders", folder) + "/" + item),
-    };
-    return library[seed];
-  } catch (err) {
-    return `${seed}`.toUpperCase();
+    const data = await recoverData(folder);
+    res.send({ data: data });
+  } catch (error) {
+    handleError(res, "ERROR_QUERY", 500);
   }
 }
 
-export async function getFolders(req, res) {
-  const { folder } = req.query;
-  let folders = [];
-  try {
-    const icons = await reader(res, "readIcons");
-
-    if (!folder) {
-      folders = await reader(res, "readFolders");
-    } else {
-      folders = await reader(res, "readFolders", folder);
-    }
-
-    if (typeof folders == "string") {
-      handleError(res, "ERROR_" + folders, 500);
-    } else {
-      if (folders == []) {
-        handleError(res, "EMPTY", 200);
-      } else {
-
-        async function iterator() {
-          let data = [];
-          folders.forEach(async (e) => {
-            let info = await reader(res, "readStat", folder, e);
-            let size = handleFormatBytes(info.size);
-            let isDirectory = info.isDirectory();
-            let type = "";
-            let icon = "";
-
-            if (isDirectory) {
-              type = "folder";
-              icon = "folder-fill.svg";
-            } else {
-              type = await reader(res, "readExtname", folder, e);
-              icon = type.split(".")[1] + ".png";
-            }
-
-            if (!icons.includes(icon)) icon = "file.svg";
-
-            data.push({
-              name: e,
-              isDirectory: isDirectory,
-              size: size,
-              type: type,
-              icon_path: icon,
-            });
-          });
-          return await data;
+export async function getIcons(req, res) {
+  const { format } = req.query;
+  if (!format) {
+    res.send({ data: await sendIcons() });
+  } else {
+    try {
+      const data = await sendIcons(format);
+      res.download(data, (err) => {
+        if (err) {
+          handleError(res, "ICON_NOT_INCLUDE", 500);
         }
-
-        res.send({ data: await iterator() });
-      }
+      });
+    } catch (error) {
+      handleError(res, "ERROR_QUERY", 500);
     }
-  } catch (err) {
-    handleError(res, "INVALID_ARGUMENTS", 500);
+  }
+}
+
+export async function getDownload(req, res) {
+  const { file } = req.query;
+  if (await checkExist(file)) {
+    try {
+      const { head, filestream } = sendDownload(file);
+      res.writeHead(200, head);
+      filestream.pipe(res);
+    } catch (error) {
+      handleError(res, "ERROR_QUERY", 500);
+    }
+  } else {
+    handleError(res, "FILE_NOT_EXIST", 500);
+  }
+}
+
+export async function createFolder(req, res) {
+  const { folderPath } = req.query;
+  if (await checkExist(folderPath)) {
+    handleError(res, "FOLDER_EXIST", 500);
+  } else {
+    try {
+      await mkdirFolder(folderPath);
+      res.send({ message: "FOLDER_CREATED" });
+    } catch (error) {
+      handleError(res, "ERROR_CREATE_FOLDER", 500);
+    }
   }
 }

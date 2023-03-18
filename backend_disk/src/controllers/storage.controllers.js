@@ -9,11 +9,19 @@ import {
   readIcons,
   sendIcon
 } from "../libs/reader.js";
+import {
+  recoverData,
+  checkExist,
+  sendIcons,
+  sendDownload,
+  mkdirFolder,
+} from "../libs/reader-v2.js";
 
 const DB_PATH = path.join(process.cwd(), "./src/database/");
 const json_files = fs.readFileSync(`${DB_PATH}/files.json`, "utf-8");
 
 // reader files and folders
+/*
 export async function getsFolders(req, res) {
   const { folder } = req.query;
   let STORAGE_PATH = "";
@@ -60,9 +68,9 @@ export async function getsFolders(req, res) {
     handleError(res, "NO_FOLDER_SUCH", 404);
   }
 }
+*/
 
 
-// test
 export async function getFolders(req, res) {
   const { folder } = req.query;
   let folders = []
@@ -78,7 +86,7 @@ export async function getFolders(req, res) {
   }
 }
 
-
+/*
 export async function getIcons(req, res) {
   const { format } = req.query;
   const icons = await readIcons();
@@ -93,6 +101,24 @@ export async function getIcons(req, res) {
       }
     } catch (error) {
       handleError(res, "NO_ICON_SUCH", 404);
+    }
+  }
+}
+*/
+export async function getIcons(req, res) {
+  const { format } = req.query;
+  if (!format) {
+    res.send({ data: await sendIcons() });
+  } else {
+    try {
+      const data = await sendIcons(format);
+      res.download(data, (err) => {
+        if (err) {
+          handleError(res, "ICON_NOT_INCLUDE", 500);
+        }
+      });
+    } catch (error) {
+      handleError(res, "ERROR_QUERY", 500);
     }
   }
 }

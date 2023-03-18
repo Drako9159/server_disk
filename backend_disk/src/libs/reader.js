@@ -3,6 +3,7 @@ import path from "node:path";
 import mime from "mime-types";
 import handleFormatBytes from "../utils/handleFormatBytes.js";
 
+
 function pathJoin(seed, file = "") {
   const library = {
     pathIcons: path.join(process.cwd(), `./src/assets/iconsFormat/${file}`),

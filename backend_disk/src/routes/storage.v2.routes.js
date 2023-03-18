@@ -1,12 +1,14 @@
 import { Router } from "express";
 
-import { getFolders } from "../controllers/storage.v2.controller.js";
+import { getDirectories, getIcons, getDownload, createFolder } from "../controllers/storage.v2.controller.js";
 const router = Router();
 
-router.get("/storage", getFolders);
+router.get("/storage", getDirectories);
 
-//router.post("/storage", newFolder);
+router.get("/storage/icons", getIcons)
 
-//router.get("/storage/icons", getIcons);
+router.get("/storage/download", getDownload )
+
+router.post("/storage", createFolder)
 
 export default router;
